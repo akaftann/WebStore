@@ -23,7 +23,7 @@ export class AuthController {
 
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
-  @Post('login/access-toke')
+  @Post('login/access-token')
   async getRefreshTokens(@Body() dto: RefreshTokenDto){
     return this.authService.getNewTokens(dto.refreshToken)
   }

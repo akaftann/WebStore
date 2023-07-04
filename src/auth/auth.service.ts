@@ -3,6 +3,8 @@ import { AuthDto } from './dto/auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { UserService } from './db-services/user-service';
+import { verify } from 'argon2';
+
 
 
 @Injectable()
@@ -15,6 +17,26 @@ export class AuthService {
         const tokens = await this.issueToken(user.id)
         return {user: this.returnUserFields(user),
         ...tokens}
+    }
+
+    async login (dto: AuthDto) {
+        const user = await this.validateUser(dto)
+        const tokkens = await this.issueToken(user.id)
+
+        return {user: this.returnUserFields(user), ...tokkens}
+
+    }
+
+    async getNewTokens (refreshToken: string) {
+        const res = await this.jwt.verifyAsync(refreshToken)
+        
+        if(!res) throw new UnauthorizedException('Invalid refresh token')
+
+        const user = await this.userService.getById(res.id)
+
+        const tokens = await this.issueToken(user.id)
+        return {user: this.returnUserFields(user),
+            ...tokens}
     }
 
     private async issueToken (userId: number) {
@@ -32,21 +54,14 @@ export class AuthService {
         }
     }
 
-    async login (dto: AuthDto) {
+    private async validateUser(dto: AuthDto){
+        const user = await this.userService.getByEmail(dto.email)
 
-    }
+        const isValid = await verify(user.password, dto.password)
+        if(!isValid) throw new UnauthorizedException('Ivalid password')
 
-    async getNewTokens (refreshToken: string) {
-        const res = await this.jwt.verifyAsync(refreshToken)
-        
-        if(res) throw new UnauthorizedException('Invalid refresh token')
-
-        const user = await this.userService.getById(res.id)
-
-        const tokens = await this.issueToken(user.id)
-        return {user: this.returnUserFields(user),
-            ...tokens}
-    }
+        return user
+    }   
 
    /* async getAll(){
     const users = this.prisma.user.findMany()

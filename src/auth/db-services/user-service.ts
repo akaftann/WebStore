@@ -1,8 +1,8 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
 import { AuthDto } from "../dto/auth.dto";
 import { faker } from '@faker-js/faker';
-import { hash } from "argon2";
+import { hash} from "argon2";
 
 @Injectable()
 export class UserService {
@@ -10,7 +10,7 @@ export class UserService {
 
     async getById (id: number) {
         const user = await this.prisma.user.findUnique({where:{id: id}})
-        if(!user) throw new BadRequestException('There is no such user')
+        if(!user) throw new NotFoundException('There is no such user')
         return user
     }
 
@@ -24,7 +24,7 @@ export class UserService {
         const existedUser = await this.prisma.user.findUnique({where:{email: dto.email}})
 
         if(existedUser) throw new BadRequestException('User already exists')
-        
+
         const user = await this.prisma.user.create({data:{
             email: dto.email,
             name: faker.person.firstName(),
