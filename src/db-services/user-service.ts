@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
-import { AuthDto } from "../dto/auth.dto";
+import { AuthDto } from "../auth/dto/auth.dto";
 import { faker } from '@faker-js/faker';
 import { hash} from "argon2";
+import { UserDto } from "src/user/dto/user.dto";
 
 @Injectable()
 export class UserService {
@@ -33,5 +34,32 @@ export class UserService {
             password: await hash(dto.password) 
         }})
         return user
+    }
+
+    async update(dto: UserDto, id:number, password: string = ''){
+        const updatedUser = await this.prisma.user.update({where:{
+            id
+        },data:{
+            email: dto.email,
+            name: dto.name,
+            avatarPath: dto.avatarPath,
+            phone: dto.phone,
+            password: dto.password? await hash(dto.password) : password
+        }})
+        return updatedUser
+    }
+
+    async updateFavorites(id:number, productId: number, isExists: boolean){
+        await this.prisma.user.update({where:{
+            id
+        },data:{
+            favorites: {
+                [isExists? 'disconnect' : 'connect']:
+                {id: productId}
+            }
+            
+        }})
+        return "Success"
+
     }
 }

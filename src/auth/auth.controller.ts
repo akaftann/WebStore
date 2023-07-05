@@ -2,6 +2,7 @@ import { Body, Controller, Get, HttpCode, Post, UsePipes, ValidationPipe } from 
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { RefreshTokenDto } from './dto/access-token.dto';
+import { Auth } from './decorators/auth.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -23,14 +24,10 @@ export class AuthController {
 
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
+  @Auth()
   @Post('login/access-token')
   async getRefreshTokens(@Body() dto: RefreshTokenDto){
     return this.authService.getNewTokens(dto.refreshToken)
   }
-
- /*  @Get()
-  async getAll(){
-    return this.authService.getAll()
-  } */
 
 }

@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/
 import { AuthDto } from './dto/auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import { UserService } from './db-services/user-service';
+import { UserService } from '../db-services/user-service';
 import { verify } from 'argon2';
 
 
@@ -28,6 +28,7 @@ export class AuthService {
     }
 
     async getNewTokens (refreshToken: string) {
+        console.log(refreshToken)
         const res = await this.jwt.verifyAsync(refreshToken)
         
         if(!res) throw new UnauthorizedException('Invalid refresh token')
