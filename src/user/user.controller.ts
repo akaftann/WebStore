@@ -1,4 +1,4 @@
-import { Controller, Get, Body, HttpCode, UsePipes, Post, ValidationPipe, Param, Put } from '@nestjs/common';
+import { Controller, Get, Body, HttpCode, UsePipes, Post, ValidationPipe, Param, Put, Patch } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { CurrentUser } from 'src/auth/decorators/user.decorator';
@@ -23,7 +23,8 @@ export class UserController {
   }
 
   @HttpCode(200)
-  @Post('profile/favorites/:productId')
+  @Auth()
+  @Patch('profile/favorites/:productId')
   async toggleFavorite(@CurrentUser('id') id: number, @Param('productId') productId: string){
     return this.userService.toggleFavorite(id, +productId)
   }
