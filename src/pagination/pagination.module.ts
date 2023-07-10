@@ -4,7 +4,8 @@ import { PaginationController } from './pagination.controller';
 import { PrismaService } from 'src/prisma.service';
 
 @Module({
-  controllers: [PaginationController],
-  providers: [PaginationService, PrismaService]
+  providers: [PaginationService, PrismaService],
+  exports: [PaginationService]
+
 })
 export class PaginationModule {}
